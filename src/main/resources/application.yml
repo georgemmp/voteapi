@@ -2,3 +2,6 @@ spring:
   data:
     mongodb:
       uri: mongodb+srv://george:123@cluster0.kkdxc.mongodb.net/softbox?retryWrites=true&w=majority
+server:
+  error:
+    include-stacktrace: on_param
