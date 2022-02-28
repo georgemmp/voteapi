@@ -1,2 +1,20 @@
-package com.softbox.voteapi.entities;public class Guideline {
+package com.softbox.voteapi.entities;
+
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
+
+@Document
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Guideline {
+    @Id
+    private Long guidelineId;
+    private String description;
+    private Boolean session;
+    private List<Vote> votes;
 }
