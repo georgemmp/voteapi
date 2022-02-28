@@ -1,35 +1,41 @@
 package com.softbox.voteapi.infrastructure.http.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
+import org.springframework.boot.web.reactive.error.ErrorAttributes;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.server.*;
+import reactor.core.publisher.Mono;
 
-@ControllerAdvice
-public class ExceptionErrorsHandler {
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<StandardError> internalServerErrorException(RuntimeException error, ServerRequest request) {
-        StandardError standardError = new StandardError(System.currentTimeMillis(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error.getMessage(), request.requestPath().value());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(standardError);
+import java.util.Map;
+import java.util.Optional;
+
+@Order(-2)
+public class ExceptionErrorsHandler extends AbstractErrorWebExceptionHandler {
+
+    public ExceptionErrorsHandler(ErrorAttributes errorAttributes,
+                                  WebProperties.Resources resources,
+                                  ApplicationContext applicationContext,
+                                  ServerCodecConfigurer codecConfigurer) {
+        super(errorAttributes, resources, applicationContext);
+        this.setMessageWriters(codecConfigurer.getWriters());
     }
 
-    @ExceptionHandler(ExceptionError.class)
-    public ResponseEntity<StandardError> exceptionError(ExceptionError error, ServerRequest request) {
-        StandardError standardError = new StandardError(System.currentTimeMillis(), error.getHttpStatus().value(), error.getMessage(), request.requestPath().value());
-        return ResponseEntity.status(error.getHttpStatus()).body(standardError);
+    @Override
+    protected RouterFunction<ServerResponse> getRoutingFunction(ErrorAttributes errorAttributes) {
+        return RouterFunctions.route(RequestPredicates.all(), this::formatErrorResponse);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<StandardError> validationError(MethodArgumentNotValidException error, ServerRequest request) {
-        ValidationError err = new ValidationError(System.currentTimeMillis(), HttpStatus.UNPROCESSABLE_ENTITY.value(), error.getMessage(), request.requestPath().value());
-
-        for (FieldError x: error.getBindingResult().getFieldErrors()) {
-            err.addError(x.getField(), x.getDefaultMessage());
-        }
-
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err);
+    private Mono<ServerResponse> formatErrorResponse(ServerRequest request) {
+       Map<String, Object> errorAttributesMap = getErrorAttributes(request, ErrorAttributeOptions.defaults());
+       Integer status = (Integer) Optional.of(errorAttributesMap.get("status")).orElse(500);
+       return ServerResponse.status(status)
+               .contentType(MediaType.APPLICATION_JSON)
+               .body(BodyInserters.fromValue(errorAttributesMap));
     }
 }
