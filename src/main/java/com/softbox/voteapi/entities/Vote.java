@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 public class Vote {
     @Id
-    private Long voteId;
+    private String voteId;
     private String voteDescription;
     private Guideline guideline;
     private Associate associate;

@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Guideline {
     @Id
-    private Long guidelineId;
+    private String guidelineId;
     private String description;
     private Boolean session;
     private List<Vote> votes;
