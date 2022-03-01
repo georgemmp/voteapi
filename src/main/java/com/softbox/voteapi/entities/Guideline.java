@@ -17,6 +17,7 @@ public class Guideline {
     private String guidelineId;
     private String description;
     private Boolean session;
+    private String result;
     @DBRef
     private List<Vote> votes;
 }

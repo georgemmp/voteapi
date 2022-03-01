@@ -1,6 +1,5 @@
 package com.softbox.voteapi.services.vote;
 
-import com.softbox.voteapi.entities.Vote;
 import com.softbox.voteapi.infrastructure.dto.VoteDTO;
 import reactor.core.publisher.Mono;
 

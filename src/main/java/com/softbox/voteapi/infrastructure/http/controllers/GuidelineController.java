@@ -1,5 +1,6 @@
 package com.softbox.voteapi.infrastructure.http.controllers;
 
+import com.softbox.voteapi.entities.Guideline;
 import com.softbox.voteapi.infrastructure.dto.GuidelineDTO;
 import com.softbox.voteapi.infrastructure.dto.VoteDTO;
 import com.softbox.voteapi.services.guideline.GuidelineService;
@@ -36,5 +37,11 @@ public class GuidelineController {
     @ResponseStatus(value = HttpStatus.CREATED)
     public Mono<Void> vote(@PathVariable String id, @Valid @RequestBody VoteDTO dto) {
         return this.voteService.save(id, dto);
+    }
+
+    @GetMapping(value = "/{id}/vote-count")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Mono<Guideline> voteCount(@PathVariable String id) {
+        return this.service.countVotes(id);
     }
 }

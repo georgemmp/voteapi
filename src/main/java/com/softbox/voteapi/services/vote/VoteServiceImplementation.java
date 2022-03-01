@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
-public class VoteServiceImplementation implements VoteService{
+public class VoteServiceImplementation implements VoteService {
     @Autowired
     private VoteRepository voteRepository;
 
@@ -38,7 +38,7 @@ public class VoteServiceImplementation implements VoteService{
                 .then(Mono.empty());
     }
 
-    public Mono<Void> checkAssociate(Vote vote, VoteDTO dto) {
+    private Mono<Void> checkAssociate(Vote vote, VoteDTO dto) {
         return this.associateRepository
                 .findByCpf(dto.getCpf())
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "CPF not found")))
@@ -49,7 +49,7 @@ public class VoteServiceImplementation implements VoteService{
                 }).then(Mono.empty());
     }
 
-    public Mono<Void> checkGuideline(Vote vote, String guidelineId) {
+    private Mono<Void> checkGuideline(Vote vote, String guidelineId) {
         return this.guidelineRepository.findById(guidelineId)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Guideline not found")))
                 .flatMap(guideline -> {
@@ -60,7 +60,7 @@ public class VoteServiceImplementation implements VoteService{
                 }).then(Mono.empty());
     }
 
-    public Mono<Void> checkIfAssociateVoted(String cpf, String guidelineId) {
+    private Mono<Void> checkIfAssociateVoted(String cpf, String guidelineId) {
         return this.voteRepository
                 .findAll()
                 .flatMap(vote -> {

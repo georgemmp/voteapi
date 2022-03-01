@@ -7,4 +7,5 @@ import reactor.core.publisher.Mono;
 public interface GuidelineService {
     Mono<Void> save(GuidelineDTO guidelineDTO);
     Mono<Void> updateSession(String id);
+    Mono<Guideline> countVotes(String guidelineId);
 }
