@@ -16,7 +16,7 @@ public class CloseSectionScheduler {
 
     @Scheduled(fixedDelay = 30000)
     public Disposable closeSection() {
-        log.info("Schedule executing");
+        log.info("Scheduler executing");
         return this.service.closeSessions()
                 .subscribeOn(Schedulers.immediate())
                 .subscribe();
