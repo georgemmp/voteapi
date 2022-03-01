@@ -38,10 +38,4 @@ public class GuidelineController {
     public Mono<Void> vote(@PathVariable String id, @Valid @RequestBody VoteDTO dto) {
         return this.voteService.save(id, dto);
     }
-
-    @GetMapping(value = "/{id}/vote-count")
-    @ResponseStatus(value = HttpStatus.OK)
-    public Mono<Guideline> voteCount(@PathVariable String id) {
-        return this.service.countVotes(id);
-    }
 }

@@ -32,6 +32,7 @@ public class GuidelineServiceImplementation implements GuidelineService {
     public Mono<Void> save(GuidelineDTO guidelineDTO) {
         Guideline guideline = Guideline.builder()
                 .description(guidelineDTO.getDescription())
+                .result(null)
                 .session(false)
                 .build();
         log.info("Guideline has been created");
@@ -58,15 +59,13 @@ public class GuidelineServiceImplementation implements GuidelineService {
                     if (diff >= 1) {
                         log.info("Session is closing");
                         item.setSession(false);
-                        return countVotes(item.getGuidelineId())
-                                .then(this.repository.save(item));
+                        return countVotes(item.getGuidelineId(), item);
                     }
                     return Mono.empty();
                 }).then(Mono.empty());
     }
 
-    @Override
-    public Mono<Guideline> countVotes(String guidelineId) {
+    private Mono<Void> countVotes(String guidelineId, Guideline guideline) {
         List<String> yesList = new ArrayList<>();
         List<String> noList = new ArrayList<>();
 
@@ -74,12 +73,14 @@ public class GuidelineServiceImplementation implements GuidelineService {
                 .then(saveVotesResult(guidelineId, yesList, noList));
     }
 
-    private Mono<Guideline> saveVotesResult(String guidelineId, List<String> yesList, List<String> noList) {
+    private Mono<Void> saveVotesResult(String guidelineId, List<String> yesList, List<String> noList) {
         return this.checkGuideline(guidelineId)
                 .flatMap(guideline -> {
+                    log.info("results has been saved");
                     guideline.setResult("Sim: " + yesList.size() + "\n Não: " + noList.size() );
+                    guideline.setSession(false);
                     return this.repository.save(guideline);
-                });
+                }).then(Mono.empty());
     }
 
     private Mono<Guideline> checkGuideline(String guidelineId) {
@@ -90,10 +91,13 @@ public class GuidelineServiceImplementation implements GuidelineService {
     private Mono<Void> checkVotes(String guidelineId, List<String> yesList, List<String> noList) {
         return this.voteRepository.findAllVotesByGuidelineId(guidelineId)
                 .flatMap(item -> {
-                    if (item.getVoteDescription().equals(VoteDescription.YES.getDescription()))
+                    System.out.println(item);
+                    if (item.getVoteDescription().equals(VoteDescription.YES.getDescription())) {
                         yesList.add(item.getVoteDescription());
-                    if (item.getVoteDescription().equals(VoteDescription.NO.getDescription()))
+                    }
+                    if (item.getVoteDescription().equals(VoteDescription.NO.getDescription())) {
                         noList.add(item.getVoteDescription());
+                    }
                     log.info("Votes computed");
                     return Mono.empty();
                 })

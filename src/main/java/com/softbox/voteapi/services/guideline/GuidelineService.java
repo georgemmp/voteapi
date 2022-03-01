@@ -8,5 +8,4 @@ public interface GuidelineService {
     Mono<Void> save(GuidelineDTO guidelineDTO);
     Mono<Void> openSession(String id);
     Mono<Void> closeSessions();
-    Mono<Guideline> countVotes(String guidelineId);
 }

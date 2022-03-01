@@ -14,7 +14,7 @@ public class CloseSectionScheduler {
     @Autowired
     private GuidelineService service;
 
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(fixedRate = 30000)
     public Disposable closeSection() {
         log.info("Scheduler executing");
         return this.service.closeSessions()
