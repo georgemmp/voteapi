@@ -6,6 +6,7 @@ import reactor.core.publisher.Mono;
 
 public interface GuidelineService {
     Mono<Void> save(GuidelineDTO guidelineDTO);
-    Mono<Void> updateSession(String id);
+    Mono<Void> openSession(String id);
+    Mono<Void> closeSessions();
     Mono<Guideline> countVotes(String guidelineId);
 }

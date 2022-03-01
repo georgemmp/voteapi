@@ -30,7 +30,7 @@ public class GuidelineController {
     @PatchMapping(value = "/{id}/session")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public Mono<Void> openSession(@PathVariable String id) {
-        return this.service.updateSession(id);
+        return this.service.openSession(id);
     }
 
     @PostMapping(value = "/{id}/vote")

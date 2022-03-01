@@ -5,14 +5,18 @@ import com.softbox.voteapi.infrastructure.dto.GuidelineDTO;
 import com.softbox.voteapi.infrastructure.repositories.GuidelineRepository;
 import com.softbox.voteapi.infrastructure.repositories.VoteRepository;
 import com.softbox.voteapi.shared.enums.VoteDescription;
+import com.softbox.voteapi.shared.utils.DateHandlerUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -35,13 +39,29 @@ public class GuidelineServiceImplementation implements GuidelineService {
     }
 
     @Override
-    public Mono<Void> updateSession(String id) {
+    public Mono<Void> openSession(String id) {
         return this.checkGuideline(id)
                 .flatMap(item -> {
                     if (item.getSession()) return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Session already is open"));
                     item.setSession(true);
+                    item.setDate(LocalDateTime.now());
                     log.info("Session is open");
                     return this.repository.save(item);
+                }).then(Mono.empty());
+    }
+
+    @Override
+    public Mono<Void> closeSessions() {
+        return this.repository.findAllSessionOpen()
+                .flatMap(item -> {
+                    long diff = DateHandlerUtil.getDiffMinutes(item.getDate(), LocalDateTime.now());
+                    if (diff >= 1) {
+                        log.info("Session is closing");
+                        item.setSession(false);
+                        return countVotes(item.getGuidelineId())
+                                .then(this.repository.save(item));
+                    }
+                    return Mono.empty();
                 }).then(Mono.empty());
     }
 
