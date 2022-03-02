@@ -2,8 +2,18 @@ spring:
   data:
     mongodb:
       uri: mongodb+srv://george:123@cluster0.kkdxc.mongodb.net/softbox?retryWrites=true&w=majority
+  kafka:
+    bootstrap-servers: localhost:9092
+topic:
+  name:
+    producer: vote-topic
+auto:
+  create:
+    topics:
+      enable: true
 server:
   error:
     include-stacktrace: on_param
 
 cpf-validator-url: https://user-info.herokuapp.com
+

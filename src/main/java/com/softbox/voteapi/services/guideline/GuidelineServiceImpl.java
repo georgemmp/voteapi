@@ -4,6 +4,7 @@ import com.softbox.voteapi.entities.Guideline;
 import com.softbox.voteapi.infrastructure.dto.GuidelineDTO;
 import com.softbox.voteapi.infrastructure.repositories.GuidelineRepository;
 import com.softbox.voteapi.infrastructure.repositories.VoteRepository;
+import com.softbox.voteapi.services.kafka.KafkaService;
 import com.softbox.voteapi.shared.enums.VoteDescription;
 import com.softbox.voteapi.shared.utils.DateHandlerUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,9 @@ public class GuidelineServiceImpl implements GuidelineService {
 
     @Autowired
     private VoteRepository voteRepository;
+
+    @Autowired
+    private KafkaService kafkaService;
 
     @Override
     public Mono<Void> save(GuidelineDTO guidelineDTO) {
@@ -77,6 +81,7 @@ public class GuidelineServiceImpl implements GuidelineService {
                     log.info("results has been saved");
                     guideline.setResult("Sim: " + yesList.size() + "\n Não: " + noList.size() );
                     guideline.setSession(false);
+                    this.kafkaService.sendMessage("vote-topic", guideline);
                     return this.repository.save(guideline);
                 }).then(Mono.empty());
     }
