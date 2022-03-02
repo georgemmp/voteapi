@@ -58,7 +58,7 @@ public class GuidelineServiceImpl implements GuidelineService {
         return this.repository.findAllSessionOpen()
                 .flatMap(item -> {
                     long diff = DateHandlerUtil.getDiffMinutes(item.getDate(), LocalDateTime.now());
-                    if (diff >= 10) {
+                    if (diff >= 1) {
                         log.info("Session is closing");
                         item.setSession(false);
                         return countVotes(item.getGuidelineId(), item);
