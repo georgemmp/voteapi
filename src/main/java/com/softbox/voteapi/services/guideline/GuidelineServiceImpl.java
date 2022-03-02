@@ -11,17 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
 @Slf4j
-public class GuidelineServiceImplementation implements GuidelineService {
+public class GuidelineServiceImpl implements GuidelineService {
     @Autowired
     private GuidelineRepository repository;
 
@@ -56,7 +54,7 @@ public class GuidelineServiceImplementation implements GuidelineService {
         return this.repository.findAllSessionOpen()
                 .flatMap(item -> {
                     long diff = DateHandlerUtil.getDiffMinutes(item.getDate(), LocalDateTime.now());
-                    if (diff >= 1) {
+                    if (diff >= 10) {
                         log.info("Session is closing");
                         item.setSession(false);
                         return countVotes(item.getGuidelineId(), item);

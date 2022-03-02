@@ -1,4 +1,4 @@
-package com.softbox.voteapi.infrastructure.scheduler;
+package com.softbox.voteapi.services.scheduler;
 
 import com.softbox.voteapi.services.guideline.GuidelineService;
 import lombok.extern.slf4j.Slf4j;

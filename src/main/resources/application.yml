@@ -5,3 +5,5 @@ spring:
 server:
   error:
     include-stacktrace: on_param
+
+cpf-validator-url: https://user-info.herokuapp.com

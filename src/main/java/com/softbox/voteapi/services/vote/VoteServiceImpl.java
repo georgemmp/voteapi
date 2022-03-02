@@ -1,21 +1,27 @@
 package com.softbox.voteapi.services.vote;
 
 import com.softbox.voteapi.entities.Vote;
+import com.softbox.voteapi.infrastructure.dto.ValidatorDTO;
 import com.softbox.voteapi.infrastructure.dto.VoteDTO;
+import com.softbox.voteapi.infrastructure.http.requests.HttpRequest;
+import com.softbox.voteapi.infrastructure.http.requests.vote.CPFVoteValidator;
 import com.softbox.voteapi.infrastructure.repositories.AssociateRepository;
 import com.softbox.voteapi.infrastructure.repositories.GuidelineRepository;
 import com.softbox.voteapi.infrastructure.repositories.VoteRepository;
 import com.softbox.voteapi.shared.enums.VoteDescription;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+
 @Service
 @Slf4j
-public class VoteServiceImplementation implements VoteService {
+public class VoteServiceImpl implements VoteService {
     @Autowired
     private VoteRepository voteRepository;
 
@@ -25,13 +31,20 @@ public class VoteServiceImplementation implements VoteService {
     @Autowired
     private GuidelineRepository guidelineRepository;
 
+    @Autowired
+    private CPFVoteValidator request;
+
+    @Value("${cpf-validator-url}")
+    private String cpfValidatorUrl;
+
     @Override
     public Mono<Void> save(String guidelineId, VoteDTO dto) {
         Vote vote = Vote.builder()
                 .voteDescription(VoteDescription.toEnum(dto.getVote()).getDescription())
                 .build();
 
-        return this.checkAssociate(vote, dto)
+        return this.requestValidator(dto.getCpf())
+                .then(checkAssociate(vote, dto))
                 .then(this.checkIfAssociateVoted(dto.getCpf(), guidelineId))
                 .then(this.checkGuideline(vote, guidelineId))
                 .then(this.voteRepository.save(vote))
@@ -70,6 +83,17 @@ public class VoteServiceImplementation implements VoteService {
                     }
                     log.info("Associate is ok to vote");
                     return Mono.empty();
+                }).then(Mono.empty());
+    }
+
+    private Mono<Void> requestValidator(String cpf) {
+        return this.request.get(cpfValidatorUrl, "/users/".concat(cpf))
+                .flatMap(item -> {
+                    log.info(item.getStatus());
+                    if(item.getStatus().equals("UNABLE_TO_VOTE")){
+                        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associate is not able to vote"));
+                    }
+                    return Mono.just(item);
                 }).then(Mono.empty());
     }
 }

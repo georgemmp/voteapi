@@ -11,11 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
-public class AssociateServiceImplementation implements AssociateService {
+public class AssociateServiceImpl implements AssociateService {
     @Autowired
     private AssociateRepository repository;
 
