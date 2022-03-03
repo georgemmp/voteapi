@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://george:123@cluster0.kkdxc.mongodb.net/softbox?retryWrites=true&w=majority
+      uri: ${DB_URL}
   kafka:
     bootstrap-servers: localhost:9092
 topic:
