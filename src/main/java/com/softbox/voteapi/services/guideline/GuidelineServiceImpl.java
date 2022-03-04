@@ -9,6 +9,7 @@ import com.softbox.voteapi.shared.enums.VoteDescription;
 import com.softbox.voteapi.shared.utils.DateHandlerUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,6 +30,9 @@ public class GuidelineServiceImpl implements GuidelineService {
 
     @Autowired
     private KafkaService kafkaService;
+
+    @Value("${topic.name.producer}")
+    private String topicNameProducer;
 
     @Override
     public Mono<Void> save(GuidelineDTO guidelineDTO) {
@@ -81,7 +85,7 @@ public class GuidelineServiceImpl implements GuidelineService {
                     log.info("results has been saved");
                     guideline.setResult("Sim: " + yesList.size() + "\n Não: " + noList.size() );
                     guideline.setSession(false);
-                    this.kafkaService.sendMessage("vote-topic", guideline);
+                    this.kafkaService.sendMessage(topicNameProducer, guideline);
                     return this.repository.save(guideline);
                 }).then(Mono.empty());
     }
@@ -94,7 +98,6 @@ public class GuidelineServiceImpl implements GuidelineService {
     private Mono<Void> checkVotes(String guidelineId, List<String> yesList, List<String> noList) {
         return this.voteRepository.findAllVotesByGuidelineId(guidelineId)
                 .flatMap(item -> {
-                    System.out.println(item);
                     if (item.getVoteDescription().equals(VoteDescription.YES.getDescription())) {
                         yesList.add(item.getVoteDescription());
                     }

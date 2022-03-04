@@ -1,9 +1,7 @@
 package com.softbox.voteapi.services.vote;
 
 import com.softbox.voteapi.entities.Vote;
-import com.softbox.voteapi.infrastructure.dto.ValidatorDTO;
 import com.softbox.voteapi.infrastructure.dto.VoteDTO;
-import com.softbox.voteapi.infrastructure.http.requests.HttpRequest;
 import com.softbox.voteapi.infrastructure.http.requests.vote.CPFVoteValidator;
 import com.softbox.voteapi.infrastructure.repositories.AssociateRepository;
 import com.softbox.voteapi.infrastructure.repositories.GuidelineRepository;
@@ -16,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
 
 @Service
 @Slf4j
@@ -44,7 +40,7 @@ public class VoteServiceImpl implements VoteService {
                 .build();
 
         return this.requestValidator(dto.getCpf())
-                .then(checkAssociate(vote, dto))
+                .then(this.checkAssociate(vote, dto))
                 .then(this.checkIfAssociateVoted(dto.getCpf(), guidelineId))
                 .then(this.checkGuideline(vote, guidelineId))
                 .then(this.voteRepository.save(vote))
@@ -90,7 +86,7 @@ public class VoteServiceImpl implements VoteService {
         return this.request.get(cpfValidatorUrl, "/users/".concat(cpf))
                 .flatMap(item -> {
                     log.info(item.getStatus());
-                    if(item.getStatus().equals("UNABLE_TO_VOTE")){
+                    if(!item.getStatus().equals("ABLE_TO_VOTE")){
                         return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associate is not able to vote"));
                     }
                     return Mono.just(item);

@@ -1,11 +1,11 @@
 # Teste softdesign
 
-O challenge foi feito em Java 11 utilizando spring 2.6.4, maven, mongodb, webflux e kafka.
+O challenge foi feito em Java 11 utilizando spring boot 2.6.4, maven, mongodb, webflux e kafka.
 
 ### Observação
 Não foi possível realizar os testes e publicação na nuvem, com isso o projeto está sendo executado localmente.
 
-### Instalção de dependências
+### Instalação de dependências
 Antes de rodar o projeto instale as dependências através da IDE ou por linha de comando.
 ```sh
 $ mvn install
