@@ -1,4 +1,4 @@
-package com.softbox.voteapi.infrastructure.http.exceptions.config;
+package com.softbox.voteapi.config;
 
 import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.context.annotation.Bean;

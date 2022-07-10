@@ -1,41 +1,45 @@
 package com.softbox.voteapi.services.associate;
 
 import com.softbox.voteapi.entities.Associate;
-import com.softbox.voteapi.infrastructure.dto.AssociateDTO;
-import com.softbox.voteapi.infrastructure.repositories.AssociateRepository;
+import com.softbox.voteapi.services.associate.repository.AssociateRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-@Service
+@RequiredArgsConstructor
 @Slf4j
-public class AssociateServiceImpl implements AssociateService {
-    @Autowired
-    private AssociateRepository repository;
+@Service
+public class AssociateServiceImpl implements AssociateService{
+    private final AssociateRepository repository;
 
     @Override
-    public Mono<Void> save(AssociateDTO dto) {
-        return this.repository.findByCpf(dto.getCpf())
-                .flatMap(item -> {
-                    if (Objects.nonNull(item)) {
-                        log.error("CPF already exists");
-                        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF already exists"));
-                    }
-                    return Mono.empty();
-                }).then(this.createAssociate(dto));
+    public Mono<Associate> save(Associate associate) {
+        return this.findByCpf(associate.getCpf())
+                .filter(item -> this.validateCpfAlreadyExists(item, associate.getCpf()))
+                .flatMap(item -> this.throwCPFException())
+                .switchIfEmpty(this.repository.save(associate))
+                .then(Mono.just(associate))
+                .doOnRequest(l -> log.info("Saving associate {}", associate))
+                .doOnSuccess(l -> log.info("Associate saved {}", associate))
+                .doOnError(error -> log.info("ERROR: {}", error.getMessage()));
     }
 
-    private Mono<Void> createAssociate(AssociateDTO dto) {
-        Associate associate = Associate.builder()
-                .cpf(dto.getCpf())
-                .name(dto.getName())
-                .build();
-        log.info("Created associate");
-        return this.repository.save(associate).then(Mono.empty());
+    @Override
+    public Mono<Associate> findByCpf(String cpf) {
+        return this.repository.findByCpf(cpf)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "CPF not found")));
+    }
+
+    private boolean validateCpfAlreadyExists(Associate associate, String cpf) {
+        return associate.getCpf().equals(cpf);
+    }
+
+    private Mono<Object> throwCPFException() {
+        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "CPF already exists"));
     }
 }

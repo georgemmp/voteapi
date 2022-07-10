@@ -1,8 +1,8 @@
-package com.softbox.voteapi.services.scheduler;
+package com.softbox.voteapi.infrastructure.scheduler;
 
 import com.softbox.voteapi.services.guideline.GuidelineService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
@@ -10,14 +10,14 @@ import reactor.core.scheduler.Schedulers;
 
 @Component
 @Slf4j
-public class CloseSectionScheduler {
-    @Autowired
-    private GuidelineService service;
+@RequiredArgsConstructor
+public class SessionScheduler {
+    private final GuidelineService service;
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 300000)
     public Disposable closeSection() {
-        log.info("Scheduler executing");
         return this.service.closeSessions()
+                .doOnRequest(l -> log.info("Checking opened votes"))
                 .subscribeOn(Schedulers.immediate())
                 .subscribe();
     }

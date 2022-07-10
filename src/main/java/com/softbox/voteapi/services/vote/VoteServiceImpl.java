@@ -1,95 +1,104 @@
 package com.softbox.voteapi.services.vote;
 
+import com.softbox.voteapi.entities.Associate;
+import com.softbox.voteapi.entities.Guideline;
 import com.softbox.voteapi.entities.Vote;
-import com.softbox.voteapi.infrastructure.dto.VoteDTO;
-import com.softbox.voteapi.infrastructure.http.requests.vote.CPFVoteValidator;
-import com.softbox.voteapi.infrastructure.repositories.AssociateRepository;
-import com.softbox.voteapi.infrastructure.repositories.GuidelineRepository;
-import com.softbox.voteapi.infrastructure.repositories.VoteRepository;
+import com.softbox.voteapi.services.associate.AssociateService;
+import com.softbox.voteapi.services.guideline.GuidelineService;
+import com.softbox.voteapi.services.vote.model.VoteCountResponse;
+import com.softbox.voteapi.services.vote.repository.VoteRepository;
 import com.softbox.voteapi.shared.enums.VoteDescription;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class VoteServiceImpl implements VoteService {
-    @Autowired
-    private VoteRepository voteRepository;
-
-    @Autowired
-    private AssociateRepository associateRepository;
-
-    @Autowired
-    private GuidelineRepository guidelineRepository;
-
-    @Autowired
-    private CPFVoteValidator request;
-
-    @Value("${cpf-validator-url}")
-    private String cpfValidatorUrl;
+    private final VoteRepository repository;
+    private final GuidelineService guidelineService;
+    private final AssociateService associateService;
 
     @Override
-    public Mono<Void> save(String guidelineId, VoteDTO dto) {
+    public Mono<Vote> processVote(Vote vote, String guidelineId) {
+        return this.findByGuidelineId(guidelineId)
+                .then(this.findbyAssociateCpf(vote.getAssociateCpf()))
+                .then(this.verifyIfAssociateAlreadyVote(vote.getAssociateCpf(), guidelineId))
+                .filter(item -> validVote(item, vote.getAssociateCpf(), guidelineId))
+                .flatMap(item -> Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Associate already vote")))
+                .switchIfEmpty(this.voteToSave(vote, guidelineId))
+                .then(Mono.just(vote))
+                .doOnRequest(l -> log.info("Processing vote"))
+                .doOnSuccess(l -> log.info("Computed vote"))
+                .doOnError(error -> log.error("ERROR: {}", error.getMessage()));
+    }
+
+    @Override
+    public Mono<VoteCountResponse> countVotes() {
+        VoteCountResponse votes = new VoteCountResponse();
+        String noDescription = VoteDescription.NO.getDescription();
+        String yesDesciption = VoteDescription.YES.getDescription();
+
+        return this.countVotesByDescription(yesDesciption)
+                .flatMap(item -> this.buildVotes(item, yesDesciption, votes))
+                .then(this.countVotesByDescription(noDescription))
+                .flatMap(item -> this.buildVotes(item, noDescription, votes))
+                .doOnRequest(l -> log.info("Counting votes"))
+                .doOnSuccess(l -> log.info("Votes counted: {}", votes))
+                .doOnError(error -> log.info("ERROR: {}", error.getMessage()));
+    }
+
+    private Mono<VoteCountResponse> buildVotes(Long number,
+                                               String description,
+                                               VoteCountResponse response) {
+        if(description.equals(VoteDescription.YES.getDescription())) {
+            response.setYes(number);
+            return Mono.just(response);
+        }
+        response.setNo(number);
+        return Mono.just(response);
+    }
+
+    private Mono<Long> countVotesByDescription(String description) {
         Vote vote = Vote.builder()
-                .voteDescription(VoteDescription.toEnum(dto.getVote()).getDescription())
+                .voteDescription(description)
                 .build();
-
-        return this.requestValidator(dto.getCpf())
-                .then(this.checkAssociate(vote, dto))
-                .then(this.checkIfAssociateVoted(dto.getCpf(), guidelineId))
-                .then(this.checkGuideline(vote, guidelineId))
-                .then(this.voteRepository.save(vote))
-                .then(Mono.empty());
+        return this.repository.count(Example.of(vote));
     }
 
-    private Mono<Void> checkAssociate(Vote vote, VoteDTO dto) {
-        return this.associateRepository
-                .findByCpf(dto.getCpf())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "CPF not found")))
-                .flatMap(associate -> {
-                    log.info("Associate checked");
-                    vote.setAssociate(associate);
-                    return Mono.empty();
-                }).then(Mono.empty());
+    private Mono<Vote> voteToSave(Vote vote, String guidelineId) {
+        vote.setVoteDescription(VoteDescription.toEnum(vote.getVoteDescription()).getDescription());
+        vote.setAssociateCpf(vote.getAssociateCpf());
+        vote.setGuidelineId(guidelineId);
+        return this.repository.save(vote);
     }
 
-    private Mono<Void> checkGuideline(Vote vote, String guidelineId) {
-        return this.guidelineRepository.findById(guidelineId)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Guideline not found")))
-                .flatMap(guideline -> {
-                    if (!guideline.getSession()) return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Session is not open"));
-                    log.info("Guideline checked");
-                    vote.setGuideline(guideline);;
-                    return Mono.empty();
-                }).then(Mono.empty());
+    private Mono<Vote> verifyIfAssociateAlreadyVote(String cpf, String guidelineId) {
+        return this.repository.findByAssociateCpfAndGuidelineId(cpf, guidelineId)
+                .filter(vote -> this.validVote(vote, cpf, guidelineId))
+                .flatMap(vote -> Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Associate already vote")));
     }
 
-    private Mono<Void> checkIfAssociateVoted(String cpf, String guidelineId) {
-        return this.voteRepository
-                .findAll()
-                .flatMap(vote -> {
-                    if (vote.getAssociate().getCpf().equals(cpf) && vote.getGuideline().getGuidelineId().equals(guidelineId)) {
-                        log.info("Associate already voted about this guideline");
-                        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associate already voted about this guideline"));
-                    }
-                    log.info("Associate is ok to vote");
-                    return Mono.empty();
-                }).then(Mono.empty());
+    private Mono<Guideline> findByGuidelineId(String id) {
+        return this.guidelineService.findById(id)
+                .filter(guideline -> guideline.getSession())
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "The guideline session must be activated")));
     }
 
-    private Mono<Void> requestValidator(String cpf) {
-        return this.request.get(cpfValidatorUrl, "/users/".concat(cpf))
-                .flatMap(item -> {
-                    log.info(item.getStatus());
-                    if(!item.getStatus().equals("ABLE_TO_VOTE")){
-                        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associate is not able to vote"));
-                    }
-                    return Mono.just(item);
-                }).then(Mono.empty());
+    private Mono<Associate> findbyAssociateCpf(String cpf) {
+        return this.associateService.findByCpf(cpf);
+    }
+
+    private boolean validVote(Vote vote, String cpf, String guidelineId) {
+        return (vote.getAssociateCpf().equals(cpf) &&
+                vote.getGuidelineId().equals(guidelineId));
     }
 }

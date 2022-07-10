@@ -1,4 +1,4 @@
-package com.softbox.voteapi.infrastructure.repositories;
+package com.softbox.voteapi.services.associate.repository;
 
 import com.softbox.voteapi.entities.Associate;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;

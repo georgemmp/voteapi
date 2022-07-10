@@ -1,4 +1,4 @@
-package com.softbox.voteapi.infrastructure.http.exceptions;
+package com.softbox.voteapi.infrastructure.exceptions;
 
 import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
@@ -19,7 +19,6 @@ import java.util.Optional;
 @Component
 @Order(-2)
 public class ExceptionErrorsHandler extends AbstractErrorWebExceptionHandler {
-
     public ExceptionErrorsHandler(ErrorAttributes errorAttributes,
                                   Resources resources,
                                   ApplicationContext applicationContext,
@@ -35,12 +34,12 @@ public class ExceptionErrorsHandler extends AbstractErrorWebExceptionHandler {
     }
 
     private Mono<ServerResponse> formatErrorResponse(ServerRequest request) {
-       Map<String, Object> errorAttributesMap = getErrorAttributes(request, ErrorAttributeOptions.defaults());
-       Throwable error = getError(request);
-       errorAttributesMap.put("message", error.getMessage());
-       Integer status = (Integer) Optional.of(errorAttributesMap.get("status")).orElse(500);
-       return ServerResponse.status(status)
-               .contentType(MediaType.APPLICATION_JSON)
-               .body(BodyInserters.fromValue(errorAttributesMap));
+        Map<String, Object> errorAttributesMap = getErrorAttributes(request, ErrorAttributeOptions.defaults());
+        Throwable error = getError(request);
+        errorAttributesMap.put("message", error.getMessage());
+        Integer status = (Integer) Optional.of(errorAttributesMap.get("status")).orElse(500);
+        return ServerResponse.status(status)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(errorAttributesMap));
     }
 }

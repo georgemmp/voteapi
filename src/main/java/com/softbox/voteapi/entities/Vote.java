@@ -13,6 +13,6 @@ public class Vote {
     @Id
     private String voteId;
     private String voteDescription;
-    private Guideline guideline;
-    private Associate associate;
+    private String guidelineId;
+    private String associateCpf;
 }

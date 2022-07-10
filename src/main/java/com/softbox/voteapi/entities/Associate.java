@@ -12,11 +12,10 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Associate {
     @Id
     private String associateId;
     private String cpf;
     private String name;
-    @DBRef
-    private List<Vote> vote;
 }

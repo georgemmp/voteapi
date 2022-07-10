@@ -20,6 +20,4 @@ public class Guideline {
     private Boolean session;
     private String result;
     private LocalDateTime date;
-    @DBRef
-    private List<Vote> votes;
 }
