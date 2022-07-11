@@ -31,9 +31,9 @@ public class VoteServiceImpl implements VoteService {
     @Override
     public Mono<Vote> processVote(Vote vote, String guidelineId) {
         return this.findByGuidelineId(guidelineId)
+                .then(this.findbyAssociateCpf(vote.getAssociateCpf()))
                 .then(this.cpfValidatorClient.cpfValidatorRequest(vote.getAssociateCpf()))
                 .flatMap(this::validateCpf)
-                .then(this.findbyAssociateCpf(vote.getAssociateCpf()))
                 .then(this.verifyIfAssociateAlreadyVote(vote.getAssociateCpf(), guidelineId))
                 .filter(item -> validVote(item, vote.getAssociateCpf(), guidelineId))
                 .flatMap(item -> Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
