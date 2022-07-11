@@ -109,7 +109,7 @@ public class VoteServiceImpl implements VoteService {
     }
 
     private Mono<Void> validateCpf(CpfValidatorResponse response) {
-        if (response.getStatus().equals(StatusCpfVote.UNABLE_TO_VOTE)) {
+        if (response.getStatus() == StatusCpfVote.UNABLE_TO_VOTE) {
             return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "CPF unable to vote"));
         }
