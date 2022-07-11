@@ -7,6 +7,9 @@ import com.softbox.voteapi.modules.associate.services.AssociateService;
 import com.softbox.voteapi.modules.guideline.services.GuidelineService;
 import com.softbox.voteapi.modules.vote.entities.VoteCountResponse;
 import com.softbox.voteapi.modules.vote.repository.VoteRepository;
+import com.softbox.voteapi.modules.vote.services.webClient.CpfValidatorClient;
+import com.softbox.voteapi.modules.vote.services.webClient.dto.CpfValidatorResponse;
+import com.softbox.voteapi.shared.enums.StatusCpfVote;
 import com.softbox.voteapi.shared.enums.VoteDescription;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +26,13 @@ public class VoteServiceImpl implements VoteService {
     private final VoteRepository repository;
     private final GuidelineService guidelineService;
     private final AssociateService associateService;
+    private final CpfValidatorClient cpfValidatorClient;
 
     @Override
     public Mono<Vote> processVote(Vote vote, String guidelineId) {
         return this.findByGuidelineId(guidelineId)
+                .then(this.cpfValidatorClient.cpfValidatorRequest(vote.getAssociateCpf()))
+                .flatMap(this::validateCpf)
                 .then(this.findbyAssociateCpf(vote.getAssociateCpf()))
                 .then(this.verifyIfAssociateAlreadyVote(vote.getAssociateCpf(), guidelineId))
                 .filter(item -> validVote(item, vote.getAssociateCpf(), guidelineId))
@@ -100,5 +106,14 @@ public class VoteServiceImpl implements VoteService {
     private boolean validVote(Vote vote, String cpf, String guidelineId) {
         return (vote.getAssociateCpf().equals(cpf) &&
                 vote.getGuidelineId().equals(guidelineId));
+    }
+
+    private Mono<Void> validateCpf(CpfValidatorResponse response) {
+        if (response.getStatus().equals(StatusCpfVote.UNABLE_TO_VOTE)) {
+            return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "CPF unable to vote"));
+        }
+
+        return Mono.empty();
     }
 }

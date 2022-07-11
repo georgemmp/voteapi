@@ -1,9 +1,9 @@
-package com.softbox.voteapi.infrastructure.controllers;
+package com.softbox.voteapi.modules.guideline.infrastructure.controller;
 
 import com.softbox.voteapi.modules.guideline.entities.Guideline;
 import com.softbox.voteapi.modules.vote.entities.Vote;
-import com.softbox.voteapi.infrastructure.controllers.dto.GuidelineDTO;
-import com.softbox.voteapi.infrastructure.controllers.dto.VoteDTO;
+import com.softbox.voteapi.modules.guideline.infrastructure.controller.dto.GuidelineDTO;
+import com.softbox.voteapi.modules.guideline.infrastructure.controller.dto.VoteDTO;
 import com.softbox.voteapi.modules.guideline.services.GuidelineService;
 import com.softbox.voteapi.modules.vote.services.VoteService;
 import com.softbox.voteapi.modules.vote.entities.VoteCountResponse;

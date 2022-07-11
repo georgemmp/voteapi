@@ -1,4 +1,4 @@
-package com.softbox.voteapi.infrastructure.controllers.dto;
+package com.softbox.voteapi.modules.guideline.infrastructure.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

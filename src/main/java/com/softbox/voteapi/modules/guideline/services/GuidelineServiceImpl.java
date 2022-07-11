@@ -2,6 +2,7 @@ package com.softbox.voteapi.modules.guideline.services;
 
 import com.softbox.voteapi.modules.guideline.entities.Guideline;
 import com.softbox.voteapi.modules.guideline.repository.GuidelineRepository;
+import com.softbox.voteapi.modules.vote.services.webClient.CpfValidatorClient;
 import com.softbox.voteapi.shared.utils.DateHandlerUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class GuidelineServiceImpl implements GuidelineService{
     private final GuidelineRepository repository;
+    private final CpfValidatorClient client;
 
     @Override
     public Mono<Guideline> save(Guideline guideline) {
