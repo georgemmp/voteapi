@@ -1,4 +1,4 @@
-package com.softbox.voteapi.services.vote.model;
+package com.softbox.voteapi.modules.vote.entities;
 
 import lombok.*;
 

@@ -1,7 +1,7 @@
-package com.softbox.voteapi.services.guideline;
+package com.softbox.voteapi.modules.guideline.services;
 
-import com.softbox.voteapi.entities.Guideline;
-import com.softbox.voteapi.services.guideline.repository.GuidelineRepository;
+import com.softbox.voteapi.modules.guideline.entities.Guideline;
+import com.softbox.voteapi.modules.guideline.repository.GuidelineRepository;
 import com.softbox.voteapi.shared.utils.DateHandlerUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

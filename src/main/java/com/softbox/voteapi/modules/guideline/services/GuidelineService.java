@@ -1,6 +1,6 @@
-package com.softbox.voteapi.services.guideline;
+package com.softbox.voteapi.modules.guideline.services;
 
-import com.softbox.voteapi.entities.Guideline;
+import com.softbox.voteapi.modules.guideline.entities.Guideline;
 import reactor.core.publisher.Mono;
 
 public interface GuidelineService {

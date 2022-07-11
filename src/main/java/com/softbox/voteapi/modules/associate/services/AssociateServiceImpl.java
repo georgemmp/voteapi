@@ -1,7 +1,7 @@
-package com.softbox.voteapi.services.associate;
+package com.softbox.voteapi.modules.associate.services;
 
-import com.softbox.voteapi.entities.Associate;
-import com.softbox.voteapi.services.associate.repository.AssociateRepository;
+import com.softbox.voteapi.modules.associate.entities.Associate;
+import com.softbox.voteapi.modules.associate.repository.AssociateRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

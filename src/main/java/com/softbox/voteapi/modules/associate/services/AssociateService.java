@@ -1,6 +1,6 @@
-package com.softbox.voteapi.services.associate;
+package com.softbox.voteapi.modules.associate.services;
 
-import com.softbox.voteapi.entities.Associate;
+import com.softbox.voteapi.modules.associate.entities.Associate;
 import reactor.core.publisher.Mono;
 
 public interface AssociateService {

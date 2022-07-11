@@ -1,4 +1,4 @@
-package com.softbox.voteapi.entities;
+package com.softbox.voteapi.modules.guideline.entities;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;

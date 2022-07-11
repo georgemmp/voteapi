@@ -1,12 +1,12 @@
-package com.softbox.voteapi.services.vote;
+package com.softbox.voteapi.modules.vote.services;
 
-import com.softbox.voteapi.entities.Associate;
-import com.softbox.voteapi.entities.Guideline;
-import com.softbox.voteapi.entities.Vote;
-import com.softbox.voteapi.services.associate.AssociateService;
-import com.softbox.voteapi.services.guideline.GuidelineService;
-import com.softbox.voteapi.services.vote.model.VoteCountResponse;
-import com.softbox.voteapi.services.vote.repository.VoteRepository;
+import com.softbox.voteapi.modules.associate.entities.Associate;
+import com.softbox.voteapi.modules.guideline.entities.Guideline;
+import com.softbox.voteapi.modules.vote.entities.Vote;
+import com.softbox.voteapi.modules.associate.services.AssociateService;
+import com.softbox.voteapi.modules.guideline.services.GuidelineService;
+import com.softbox.voteapi.modules.vote.entities.VoteCountResponse;
+import com.softbox.voteapi.modules.vote.repository.VoteRepository;
 import com.softbox.voteapi.shared.enums.VoteDescription;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,12 +1,12 @@
 package com.softbox.voteapi.infrastructure.controllers;
 
-import com.softbox.voteapi.entities.Guideline;
-import com.softbox.voteapi.entities.Vote;
+import com.softbox.voteapi.modules.guideline.entities.Guideline;
+import com.softbox.voteapi.modules.vote.entities.Vote;
 import com.softbox.voteapi.infrastructure.controllers.dto.GuidelineDTO;
 import com.softbox.voteapi.infrastructure.controllers.dto.VoteDTO;
-import com.softbox.voteapi.services.guideline.GuidelineService;
-import com.softbox.voteapi.services.vote.VoteService;
-import com.softbox.voteapi.services.vote.model.VoteCountResponse;
+import com.softbox.voteapi.modules.guideline.services.GuidelineService;
+import com.softbox.voteapi.modules.vote.services.VoteService;
+import com.softbox.voteapi.modules.vote.entities.VoteCountResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

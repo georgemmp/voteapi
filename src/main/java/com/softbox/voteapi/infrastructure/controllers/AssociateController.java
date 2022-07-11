@@ -1,8 +1,8 @@
 package com.softbox.voteapi.infrastructure.controllers;
 
-import com.softbox.voteapi.entities.Associate;
+import com.softbox.voteapi.modules.associate.entities.Associate;
 import com.softbox.voteapi.infrastructure.controllers.dto.AssociateDTO;
-import com.softbox.voteapi.services.associate.AssociateService;
+import com.softbox.voteapi.modules.associate.services.AssociateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

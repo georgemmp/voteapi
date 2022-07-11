@@ -1,6 +1,6 @@
 package com.softbox.voteapi.infrastructure.scheduler;
 
-import com.softbox.voteapi.services.guideline.GuidelineService;
+import com.softbox.voteapi.modules.guideline.services.GuidelineService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
