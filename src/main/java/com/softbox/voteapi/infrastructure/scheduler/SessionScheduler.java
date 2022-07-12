@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.Objects;
@@ -30,13 +28,13 @@ public class SessionScheduler {
     public Disposable closeSection() {
         return this.guidelineService.closeSessions()
                 .flatMap(guideline -> this.voteService.countVotes(guideline.getGuidelineId()))
-                .doOnNext(this::checkObjectIfIsNull)
+                .doOnNext(this::sendMessage)
                 .doOnRequest(l -> log.info("Checking opened votes"))
                 .subscribeOn(Schedulers.immediate())
                 .subscribe();
     }
 
-    public void checkObjectIfIsNull(Object object) {
+    public void sendMessage(Object object) {
         if (Objects.nonNull(object)) {
             log.info("Sending message to topic {}", voteTopic);
             this.kafkaRepository.producer(object, voteTopic);
