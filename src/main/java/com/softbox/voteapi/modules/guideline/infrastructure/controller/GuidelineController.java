@@ -48,7 +48,7 @@ public class GuidelineController {
 
     @GetMapping(value = "/{guidelineId}/vote-count")
     @ResponseStatus(value = HttpStatus.OK)
-    public Mono<VoteCountResponse> votesCount() {
-        return this.voteService.countVotes();
+    public Mono<VoteCountResponse> votesCount(@PathVariable String guidelineId) {
+        return this.voteService.countVotes(guidelineId);
     }
 }

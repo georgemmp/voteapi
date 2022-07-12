@@ -11,6 +11,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class VoteCountResponse {
     private Long yes;
     private Long no;
+    private String guidelineId;
 
     @Override
     public String toString() {

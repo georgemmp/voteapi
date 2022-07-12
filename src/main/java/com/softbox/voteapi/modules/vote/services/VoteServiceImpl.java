@@ -13,7 +13,6 @@ import com.softbox.voteapi.shared.enums.StatusCpfVote;
 import com.softbox.voteapi.shared.enums.VoteDescription;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -46,36 +45,39 @@ public class VoteServiceImpl implements VoteService {
     }
 
     @Override
-    public Mono<VoteCountResponse> countVotes() {
+    public Mono<VoteCountResponse> countVotes(String guidelineId) {
         VoteCountResponse votes = new VoteCountResponse();
-        String noDescription = VoteDescription.NO.getDescription();
-        String yesDesciption = VoteDescription.YES.getDescription();
 
-        return this.countVotesByDescription(yesDesciption)
-                .flatMap(item -> this.buildVotes(item, yesDesciption, votes))
-                .then(this.countVotesByDescription(noDescription))
-                .flatMap(item -> this.buildVotes(item, noDescription, votes))
+        String yes = VoteDescription.YES.getDescription();
+        String no = VoteDescription.NO.getDescription();
+
+        return this.countVouteByGuidelineAndDescription(guidelineId, yes)
+                .flatMap(number -> this.setVotes(number, votes, guidelineId, yes))
+                .then(this.countVouteByGuidelineAndDescription(guidelineId, no))
+                .flatMap(number -> this.setVotes(number, votes, guidelineId, no))
                 .doOnRequest(l -> log.info("Counting votes"))
                 .doOnSuccess(l -> log.info("Votes counted: {}", votes))
-                .doOnError(error -> log.info("ERROR: {}", error.getMessage()));
+                .doOnError(error -> log.error("ERROR: {}", error.getMessage()));
     }
 
-    private Mono<VoteCountResponse> buildVotes(Long number,
-                                               String description,
-                                               VoteCountResponse response) {
-        if(description.equals(VoteDescription.YES.getDescription())) {
-            response.setYes(number);
-            return Mono.just(response);
+    private Mono<Long> countVouteByGuidelineAndDescription(String guidelineId, String description) {
+        return this.repository.findByGuidelineId(guidelineId)
+                .filter(vote -> vote.getVoteDescription().equals(description))
+                .count();
+    }
+
+    private Mono<VoteCountResponse> setVotes(Long number,
+                                             VoteCountResponse votes,
+                                             String guidelineId,
+                                             String description) {
+        if (description == VoteDescription.YES.getDescription()) {
+            votes.setYes(number);
+        } else {
+            votes.setNo(number);
         }
-        response.setNo(number);
-        return Mono.just(response);
-    }
 
-    private Mono<Long> countVotesByDescription(String description) {
-        Vote vote = Vote.builder()
-                .voteDescription(description)
-                .build();
-        return this.repository.count(Example.of(vote));
+        votes.setGuidelineId(guidelineId);
+        return Mono.just(votes);
     }
 
     private Mono<Vote> voteToSave(Vote vote, String guidelineId) {

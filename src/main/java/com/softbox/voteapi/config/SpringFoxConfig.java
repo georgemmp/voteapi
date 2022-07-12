@@ -1,4 +1,4 @@
-package com.softbox.voteapi.shared.config;
+package com.softbox.voteapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

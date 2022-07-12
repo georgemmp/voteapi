@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,6 @@ import java.time.LocalDateTime;
 @Slf4j
 public class GuidelineServiceImpl implements GuidelineService{
     private final GuidelineRepository repository;
-    private final CpfValidatorClient client;
 
     @Override
     public Mono<Guideline> save(Guideline guideline) {
@@ -43,11 +43,10 @@ public class GuidelineServiceImpl implements GuidelineService{
     }
 
     @Override
-    public Mono<Void> closeSessions() {
+    public Flux<Guideline> closeSessions() {
         return this.repository.findAllSessionsOpen()
                 .flatMap(this::sessionToClose)
-                .doOnError(error -> log.error("ERROR: {}", error.getMessage()))
-                .then();
+                .doOnError(error -> log.error("ERROR: {}", error.getMessage()));
     }
 
     @Override
