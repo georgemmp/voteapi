@@ -2,7 +2,9 @@ package com.softbox.voteapi.modules.config;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.softbox.voteapi.modules.associate.services.AssociateService;
 import com.softbox.voteapi.modules.vote.services.webClient.CpfValidatorClient;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +33,12 @@ public class TestConfig {
         WireMockServer wireMockServer = new WireMockServer(WireMockConfiguration.options().dynamicPort());
         wireMockServer.start();
         return wireMockServer;
+    }
+
+    @Bean
+    @Scope(value = "prototype")
+    public WebProperties.Resources resources() {
+        return new WebProperties.Resources();
     }
 
     @Bean

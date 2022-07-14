@@ -2,6 +2,7 @@ package com.softbox.voteapi.modules.vote.services.webClient;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.softbox.voteapi.modules.IntegrationTest;
 import com.softbox.voteapi.modules.config.TestConfig;
 import com.softbox.voteapi.modules.vote.services.webClient.dto.CpfValidatorResponse;
 import org.junit.Assert;
@@ -17,8 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-@ExtendWith(SpringExtension.class)
-@Import(TestConfig.class)
+@IntegrationTest
 public class CpfValidatorClientTest {
 
     @Autowired

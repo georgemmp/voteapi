@@ -6,6 +6,7 @@ import com.softbox.voteapi.modules.vote.services.VoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "scheduling.enable")
 public class SessionScheduler {
     private final GuidelineService guidelineService;
     private final VoteService voteService;
