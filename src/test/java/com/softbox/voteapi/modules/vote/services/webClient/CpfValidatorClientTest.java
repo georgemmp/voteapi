@@ -3,18 +3,15 @@ package com.softbox.voteapi.modules.vote.services.webClient;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.softbox.voteapi.modules.IntegrationTest;
-import com.softbox.voteapi.modules.config.TestConfig;
-import com.softbox.voteapi.modules.vote.services.webClient.dto.CpfValidatorResponse;
+import com.softbox.voteapi.webClient.CpfValidatorClient;
+import com.softbox.voteapi.webClient.dto.CpfValidatorResponse;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -45,7 +42,7 @@ public class CpfValidatorClientTest {
                                 .withBody(responseBody()))
         );
 
-        Mono<CpfValidatorResponse> result = this.cpfValidatorClient.cpfValidatorRequest(CPF);
+        Mono<CpfValidatorResponse> result = this.cpfValidatorClient.validateCpf(CPF);
 
         StepVerifier.create(result)
                 .assertNext(response -> {

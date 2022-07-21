@@ -7,8 +7,8 @@ import com.softbox.voteapi.modules.associate.services.AssociateService;
 import com.softbox.voteapi.modules.guideline.services.GuidelineService;
 import com.softbox.voteapi.modules.vote.entities.VoteCountResponse;
 import com.softbox.voteapi.modules.vote.repository.VoteRepository;
-import com.softbox.voteapi.modules.vote.services.webClient.CpfValidatorClient;
-import com.softbox.voteapi.modules.vote.services.webClient.dto.CpfValidatorResponse;
+import com.softbox.voteapi.webClient.CpfValidatorClient;
+import com.softbox.voteapi.webClient.dto.CpfValidatorResponse;
 import com.softbox.voteapi.shared.enums.StatusCpfVote;
 import com.softbox.voteapi.shared.enums.VoteDescription;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +31,6 @@ public class VoteServiceImpl implements VoteService {
     public Mono<Vote> processVote(Vote vote, String guidelineId) {
         return this.findByGuidelineId(guidelineId)
                 .then(this.findbyAssociateCpf(vote.getAssociateCpf()))
-                .then(this.cpfValidatorClient.cpfValidatorRequest(vote.getAssociateCpf()))
-                .flatMap(this::validateCpf)
                 .then(this.verifyIfAssociateAlreadyVote(vote.getAssociateCpf(), guidelineId))
                 .filter(item -> validVote(item, vote.getAssociateCpf(), guidelineId))
                 .flatMap(item -> Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -110,12 +108,4 @@ public class VoteServiceImpl implements VoteService {
                 vote.getGuidelineId().equals(guidelineId));
     }
 
-    private Mono<Void> validateCpf(CpfValidatorResponse response) {
-        if (response.getStatus() == StatusCpfVote.UNABLE_TO_VOTE) {
-            return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "CPF unable to vote"));
-        }
-
-        return Mono.empty();
-    }
 }

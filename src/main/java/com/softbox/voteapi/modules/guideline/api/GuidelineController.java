@@ -1,12 +1,13 @@
-package com.softbox.voteapi.modules.guideline.infrastructure.controller;
+package com.softbox.voteapi.modules.guideline.api;
 
 import com.softbox.voteapi.modules.guideline.entities.Guideline;
 import com.softbox.voteapi.modules.vote.entities.Vote;
-import com.softbox.voteapi.modules.guideline.infrastructure.controller.dto.GuidelineDTO;
-import com.softbox.voteapi.modules.guideline.infrastructure.controller.dto.VoteDTO;
+import com.softbox.voteapi.modules.guideline.api.dto.GuidelineDTO;
+import com.softbox.voteapi.modules.guideline.api.dto.VoteDTO;
 import com.softbox.voteapi.modules.guideline.services.GuidelineService;
 import com.softbox.voteapi.modules.vote.services.VoteService;
 import com.softbox.voteapi.modules.vote.entities.VoteCountResponse;
+import com.softbox.voteapi.webClient.CpfValidatorClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 public class GuidelineController {
     private final GuidelineService service;
     private final VoteService voteService;
+    private final CpfValidatorClient client;
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
@@ -43,7 +45,8 @@ public class GuidelineController {
                 .associateCpf(voteDTO.getCpf())
                 .build();
 
-        return this.voteService.processVote(vote, guidelineId);
+        return this.client.validateCpf(voteDTO.getCpf())
+                .then(this.voteService.processVote(vote, guidelineId));
     }
 
     @GetMapping(value = "/{guidelineId}/vote-count")

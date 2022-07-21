@@ -9,10 +9,8 @@ import com.softbox.voteapi.modules.guideline.services.GuidelineServiceImpl;
 import com.softbox.voteapi.modules.vote.entities.Vote;
 import com.softbox.voteapi.modules.vote.entities.VoteCountResponse;
 import com.softbox.voteapi.modules.vote.repository.VoteRepository;
-import com.softbox.voteapi.modules.vote.services.VoteServiceImpl;
-import com.softbox.voteapi.modules.vote.services.webClient.CpfValidatorClient;
-import com.softbox.voteapi.modules.vote.services.webClient.dto.CpfValidatorResponse;
 import com.softbox.voteapi.shared.enums.StatusCpfVote;
+import com.softbox.voteapi.webClient.dto.CpfValidatorResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,11 +20,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.Optional;
-
-import static org.mockito.BDDMockito.*;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class VoteServiceTest {
@@ -41,9 +37,6 @@ public class VoteServiceTest {
 
     @Mock
     private AssociateServiceImpl associateService;
-
-    @Mock
-    private CpfValidatorClient client;
 
     @Test
     public void shouldProcessVote() {
@@ -67,8 +60,6 @@ public class VoteServiceTest {
         CpfValidatorResponse response = CpfValidatorResponse.builder()
                 .status(StatusCpfVote.ABLE_TO_VOTE)
                 .build();
-
-        when(this.client.cpfValidatorRequest(associate.getCpf())).thenReturn(Mono.just(response));
 
         when(this.voteRepository.findByAssociateCpfAndGuidelineId(anyString(), anyString()))
                 .thenReturn(Mono.empty());
@@ -111,8 +102,6 @@ public class VoteServiceTest {
                 .status(StatusCpfVote.UNABLE_TO_VOTE)
                 .build();
 
-        when(this.client.cpfValidatorRequest(associate.getCpf())).thenReturn(Mono.just(response));
-
         when(this.voteRepository.findByAssociateCpfAndGuidelineId(anyString(), anyString()))
                 .thenReturn(Mono.empty());
 
@@ -147,8 +136,6 @@ public class VoteServiceTest {
         CpfValidatorResponse response = CpfValidatorResponse.builder()
                 .status(StatusCpfVote.ABLE_TO_VOTE)
                 .build();
-
-        when(this.client.cpfValidatorRequest(associate.getCpf())).thenReturn(Mono.just(response));
 
         when(this.voteRepository.findByAssociateCpfAndGuidelineId(anyString(), anyString()))
                 .thenReturn(Mono.just(vote));
