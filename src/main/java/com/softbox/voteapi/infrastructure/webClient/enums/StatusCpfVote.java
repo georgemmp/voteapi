@@ -1,4 +1,4 @@
-package com.softbox.voteapi.shared.enums;
+package com.softbox.voteapi.infrastructure.webClient.enums;
 
 public enum StatusCpfVote {
     ABLE_TO_VOTE,

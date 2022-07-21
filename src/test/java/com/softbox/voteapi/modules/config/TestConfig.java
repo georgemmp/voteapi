@@ -2,7 +2,7 @@ package com.softbox.voteapi.modules.config;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.softbox.voteapi.webClient.CpfValidatorClient;
+import com.softbox.voteapi.infrastructure.webClient.CpfValidatorClient;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;

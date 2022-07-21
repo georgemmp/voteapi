@@ -9,8 +9,8 @@ import com.softbox.voteapi.modules.guideline.services.GuidelineServiceImpl;
 import com.softbox.voteapi.modules.vote.entities.Vote;
 import com.softbox.voteapi.modules.vote.entities.VoteCountResponse;
 import com.softbox.voteapi.modules.vote.repository.VoteRepository;
-import com.softbox.voteapi.shared.enums.StatusCpfVote;
-import com.softbox.voteapi.webClient.dto.CpfValidatorResponse;
+import com.softbox.voteapi.infrastructure.webClient.enums.StatusCpfVote;
+import com.softbox.voteapi.infrastructure.webClient.dto.CpfValidatorResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -77,41 +77,6 @@ public class VoteServiceTest {
                     assertEquals("123", vote1.getGuidelineId());
                     assertEquals("Sim", vote1.getVoteDescription());
                 }).verifyComplete();
-    }
-
-    @Test
-    public void cpfShouldBeUnableToVote() {
-        Guideline guideline = GuidelineGenerator.create()
-                .session(true)
-                .build();
-
-        Vote vote = Vote.builder()
-                .guidelineId("1")
-                .voteDescription("Sim")
-                .associateCpf("12345678")
-                .voteId("123")
-                .build();
-
-        when(this.guidelineService.findById(anyString())).thenReturn(Mono.just(guideline));
-
-        Associate associate = AssociateGenerator.create().build();
-
-        lenient().when(this.associateService.findByCpf(anyString())).thenReturn(Mono.just(associate));
-
-        CpfValidatorResponse response = CpfValidatorResponse.builder()
-                .status(StatusCpfVote.UNABLE_TO_VOTE)
-                .build();
-
-        when(this.voteRepository.findByAssociateCpfAndGuidelineId(anyString(), anyString()))
-                .thenReturn(Mono.empty());
-
-        when(this.voteRepository.save(vote)).thenReturn(Mono.just(vote));
-
-        Mono<Vote> result = this.service.processVote(vote, guideline.getGuidelineId());
-
-        StepVerifier.create(result)
-                .expectError()
-                .verify();
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.softbox.voteapi.shared.enums;
+package com.softbox.voteapi.modules.vote.entities.enums;
 
 import lombok.Getter;
 

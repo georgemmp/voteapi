@@ -1,6 +1,6 @@
-package com.softbox.voteapi.webClient.dto;
+package com.softbox.voteapi.infrastructure.webClient.dto;
 
-import com.softbox.voteapi.shared.enums.StatusCpfVote;
+import com.softbox.voteapi.infrastructure.webClient.enums.StatusCpfVote;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

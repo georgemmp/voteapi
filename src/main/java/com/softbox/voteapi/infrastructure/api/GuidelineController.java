@@ -7,7 +7,7 @@ import com.softbox.voteapi.infrastructure.api.dto.VoteDTO;
 import com.softbox.voteapi.modules.guideline.services.GuidelineService;
 import com.softbox.voteapi.modules.vote.services.VoteService;
 import com.softbox.voteapi.modules.vote.entities.VoteCountResponse;
-import com.softbox.voteapi.webClient.CpfValidatorClient;
+import com.softbox.voteapi.infrastructure.webClient.CpfValidatorClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

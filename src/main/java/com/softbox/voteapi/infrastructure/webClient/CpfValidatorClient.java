@@ -1,7 +1,7 @@
-package com.softbox.voteapi.webClient;
+package com.softbox.voteapi.infrastructure.webClient;
 
-import com.softbox.voteapi.shared.enums.StatusCpfVote;
-import com.softbox.voteapi.webClient.dto.CpfValidatorResponse;
+import com.softbox.voteapi.infrastructure.webClient.enums.StatusCpfVote;
+import com.softbox.voteapi.infrastructure.webClient.dto.CpfValidatorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
