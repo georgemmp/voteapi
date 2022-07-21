@@ -1,6 +1,6 @@
-package com.softbox.voteapi.modules.associate.api;
+package com.softbox.voteapi.infrastructure.api;
 
-import com.softbox.voteapi.modules.associate.api.dto.AssociateDTO;
+import com.softbox.voteapi.infrastructure.api.dto.AssociateDTO;
 import com.softbox.voteapi.modules.associate.entities.Associate;
 import com.softbox.voteapi.modules.associate.services.AssociateService;
 import lombok.RequiredArgsConstructor;

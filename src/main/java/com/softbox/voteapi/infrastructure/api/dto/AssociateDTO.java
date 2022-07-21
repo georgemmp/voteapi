@@ -1,4 +1,4 @@
-package com.softbox.voteapi.modules.guideline.api.dto;
+package com.softbox.voteapi.infrastructure.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,13 +13,13 @@ import java.io.Serializable;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class VoteDTO implements Serializable {
+public class AssociateDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @NotEmpty(message = "CPF is required")
+    @NotEmpty(message = "CPF is a required field")
     @CPF(message = "Invalid CPF")
-    String cpf;
+    private String cpf;
 
-    @NotEmpty(message = "Vote is required")
-    String vote;
+    @NotEmpty(message = "Name is required field")
+    private String name;
 }
