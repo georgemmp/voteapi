@@ -1,7 +1,10 @@
 spring:
   data:
     mongodb:
-      uri: ${DB_URL}
+      database: voteapi
+      authentication-database: voteapi
+      repositories: null
+      enabled: true
   kafka:
     bootstrap-servers: localhost:9092
 topic:

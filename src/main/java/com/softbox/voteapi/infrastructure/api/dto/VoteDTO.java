@@ -1,5 +1,6 @@
 package com.softbox.voteapi.infrastructure.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,8 +19,8 @@ public class VoteDTO implements Serializable {
 
     @NotEmpty(message = "CPF is required")
     @CPF(message = "Invalid CPF")
-    String cpf;
+    String associateCpf;
 
-    @NotEmpty(message = "Vote is required")
-    String vote;
+    @NotEmpty(message = "Vote Description is required")
+    String voteDescription;
 }

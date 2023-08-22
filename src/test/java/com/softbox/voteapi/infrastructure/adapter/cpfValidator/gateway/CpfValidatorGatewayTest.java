@@ -1,0 +1,59 @@
+package com.softbox.voteapi.infrastructure.adapter.cpfValidator.gateway;
+
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.softbox.voteapi.IntegrationTest;
+import com.softbox.voteapi.domain.entity.cpfValidator.CpfValidatorResponse;
+import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+@IntegrationTest
+public class CpfValidatorGatewayTest {
+
+    @MockBean
+    private CpfValidatorGatewayImpl gateway;
+
+    @Autowired
+    private WireMockServer wireMockServer;
+
+    @BeforeEach
+    public void setup() {
+        this.wireMockServer.resetRequests();
+    }
+
+    private final String CPF = "95963867002";
+
+    @Test
+    public void shouldCallCpfValidatorWebClient() {
+        this.wireMockServer.stubFor(
+                WireMock.get(WireMock.urlEqualTo("/users/" + CPF))
+                        .willReturn(WireMock.aResponse()
+                                .withHeader(HttpHeaders.CONTENT_TYPE,
+                                        MediaType.APPLICATION_JSON_VALUE)
+                                .withStatus(HttpStatus.OK.value())
+                                .withBody(responseBody()))
+        );
+
+        Mono<CpfValidatorResponse> result = this.gateway.execute(CPF);
+
+        StepVerifier.create(result)
+                .assertNext(response -> {
+                    Assert.assertNotNull(response);
+                    Assert.assertEquals("ABLE_TO_VOTE", response.getStatus());
+                });
+    }
+
+    private String responseBody() {
+        return "{\n" +
+                "   \"status\":\"ABLE_TO_VOTE\"\n" +
+                "}";
+    }
+}
